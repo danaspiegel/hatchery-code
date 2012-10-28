@@ -1,53 +1,44 @@
 from django.db import models
 
-LOT_TYPES = (
-    ('S', 'Street Lot'),
-    ('M', 'Multi-level Above Ground'),
-    ('O', 'Multi-level Below Ground'),
+from countries import COUNTRIES
+
+ADDRESS_TYPES = (
+    ('W', 'Work'),
+    ('H', 'Home'),
+    ('O', 'Other'),
 )
 
-SPOT_SIZES = (
-    ('S', 'Standard'),
-    ('C', 'Compact'),
-    ('T', 'Truck'),
-    ('U', 'Unusable'),
-)
+class Person(models.Model):
+    first_name = models.CharField(max_length=100, db_index=True)
+    last_name = models.CharField(max_length=100, db_index=True)
+    email = models.EmailField(max_length=100)
+    
+    class Meta:
+        verbose_name = 'Person'
+        verbose_name_plural = 'People'
 
-ORIENTATIONS = (
-    ('N', 'North'),
-    ('NE', 'North East'),
-    ('E', 'East'),
-)
+    def __unicode__(self):
+        return u'{0} {1}'.format(self.first_name, self.last_name)
 
-class Lot(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100)
-    lot_type = models.CharField(max_length=1, choices=LOT_TYPES, db_index=True)
-#    address = models.ForeignKey('Address', related_name='lots', unique=True)
-    open_time = models.TimeField('Lot opens')
-    close_time = models.TimeField('Lot closes')
-    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2)
-    monthly_rate = models.DecimalField(max_digits=6, decimal_places=2)
-    
-    @property
-    def is_open(self):
-        return self.open_time <= datetime.datetime.utcnow() <= self.close_time
-    
-    @property
-    def spot_count(self):
-        return self.spots.count()
-    
-    @property
-    def spot_count_by_level(self):
-        return self.spots.order_by('level').\
-               values_list('level').annotate(Count('level'))
+class Address(models.Model):
+    person = models.ForeignKey('Person', related_name='addresses')
+    address_type = models.CharField(max_length=1, choices=ADDRESS_TYPES, db_index=True)
 
+    street_address_1 = models.CharField(max_length=100)
+    street_address_2 = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state_province = models.CharField(max_length=100, db_index=True)
+    postal_code = models.CharField(max_length=10)
+    country = models.CharField(max_length=2, choices=COUNTRIES, db_index=True)
     
-class Spot(models.Model):
-    lot = models.ForeignKey('Lot', related_name='spots')
-    level = models.IntegerField(default=0)
-    designation = models.CharField(max_length=2, blank=True)
-    size = models.CharField(max_length=1, choices=SPOT_SIZES, db_index=True)
-    orientation = models.CharField(max_length=2, choices=ORIENTATIONS)
-    grid_x = models.IntegerField()
-    grid_y = models.IntegerField()
+    is_primary_address = models.BooleanField(default=True, db_index=True)
+
+    class Meta:
+        verbose_name = 'Address'
+        verbose_name_plural = 'Addresses'
+
+    def __unicode__(self):
+        return u'{0}: {1}, {2}, {3}, {4}'.format(self.get_country_display(),
+                                            self.street_address_1,
+                                            self.city, self.state_province,
+                                            self.postal_code)

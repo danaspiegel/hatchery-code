@@ -28,6 +28,10 @@ class Lot(models.Model):
     hourly_rate = models.DecimalField(max_digits=6, decimal_places=2)
     monthly_rate = models.DecimalField(max_digits=6, decimal_places=2)
     
+    class Meta:
+        verbose_name = 'Lot'
+        verbose_name_plural = 'Lots'
+
     @property
     def is_open(self):
         return self.open_time <= datetime.datetime.utcnow() <= self.close_time
@@ -53,6 +57,10 @@ class Spot(models.Model):
     orientation = models.CharField(max_length=2, choices=ORIENTATIONS)
     grid_x = models.IntegerField()
     grid_y = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'Parking Spot'
+        verbose_name_plural = 'Parking Spots'
 
     def __unicode__(self):
         return u'{0}-{1}'.format(self.level, self.designation)
