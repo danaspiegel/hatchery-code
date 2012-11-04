@@ -22,8 +22,18 @@ class PlayerAdmin(admin.ModelAdmin):
 
 
 class GameAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'played_on', 'location', 'home_team', 'away_team', )
+    search_fields = ('home_roster__team__name', 'away_roster__team__name',
+                     'location', )
+    list_filter = ('location', )
+    ordering = ('played_on', )
 
+
+    def home_team(self, obj):
+        return obj.home_roster.team.name
+
+    def away_team(self, obj):
+        return obj.away_roster.team.name
 
 class RosterAdmin(admin.ModelAdmin):
     list_display = ('team', 'home_game', 'away_game', )
