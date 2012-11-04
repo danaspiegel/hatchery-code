@@ -14,3 +14,5 @@ media/uploads
 tmp
 .DS_Store
 sqlite.db
+.idea
+sqlite.db.temp

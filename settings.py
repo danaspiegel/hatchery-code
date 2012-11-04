@@ -68,6 +68,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'project',
     'parking_lot',
+    'softball',
 )
 
 LOGGING = {

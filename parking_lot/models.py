@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 LOT_TYPES = (
@@ -20,6 +22,8 @@ ORIENTATIONS = (
 )
 
 class Lot(models.Model):
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100)
     lot_type = models.CharField(max_length=1, choices=LOT_TYPES, db_index=True)
@@ -34,7 +38,7 @@ class Lot(models.Model):
 
     @property
     def is_open(self):
-        return self.open_time <= datetime.datetime.utcnow() <= self.close_time
+        return self.open_time <= datetime.datetime.utcnow().time() <= self.close_time
     
     @property
     def spot_count(self):
@@ -50,6 +54,8 @@ class Lot(models.Model):
 
     
 class Spot(models.Model):
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
     lot = models.ForeignKey('Lot', related_name='spots')
     level = models.IntegerField(default=0)
     designation = models.CharField(max_length=2, blank=True)
@@ -63,4 +69,8 @@ class Spot(models.Model):
         verbose_name_plural = 'Parking Spots'
 
     def __unicode__(self):
+        return self.name
+    
+    @property
+    def name(self):
         return u'{0}-{1}'.format(self.level, self.designation)
