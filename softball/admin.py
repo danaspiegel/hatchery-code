@@ -32,8 +32,10 @@ class GameAdmin(admin.ModelAdmin):
     def home_team(self, obj):
         return obj.home_roster.team.name
 
+
     def away_team(self, obj):
         return obj.away_roster.team.name
+
 
 class RosterAdmin(admin.ModelAdmin):
     list_display = ('team', 'home_game', 'away_game', )
