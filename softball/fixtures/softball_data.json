@@ -468,8 +468,8 @@
         "pk": 60,
         "model": "softball.player",
         "fields": {
-            "updated_on": null,
-            "created_on": null,
+            "updated_on": "2012-11-04T04:04:52.627Z",
+            "created_on": "2012-11-04T03:21:04.572Z",
             "team": 4,
             "name": "Jeremy Benavidez",
             "number": 61
@@ -803,8 +803,80 @@
             "home_roster": 10,
             "location": "Field B",
             "played_on": "2012-11-03T13:58:45Z",
-            "away_roster": 2,
-            "updated_on": "2012-11-04T03:58:48.264Z"
+            "away_roster": 14,
+            "updated_on": "2012-11-04T04:08:46.729Z"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "softball.game",
+        "fields": {
+            "created_on": "2012-11-04T04:09:25.504Z",
+            "home_roster": 2,
+            "location": "Field A",
+            "played_on": "2012-11-04T10:09:24Z",
+            "away_roster": 11,
+            "updated_on": "2012-11-04T04:09:25.504Z"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "softball.game",
+        "fields": {
+            "created_on": "2012-11-04T04:09:41.364Z",
+            "home_roster": 7,
+            "location": "Field B",
+            "played_on": "2012-11-04T10:09:41Z",
+            "away_roster": 15,
+            "updated_on": "2012-11-04T04:09:41.364Z"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "softball.game",
+        "fields": {
+            "created_on": "2012-11-04T04:11:35.835Z",
+            "home_roster": 16,
+            "location": "Field A",
+            "played_on": "2012-11-02T13:11:29Z",
+            "away_roster": 3,
+            "updated_on": "2012-11-04T04:11:35.835Z"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "softball.game",
+        "fields": {
+            "created_on": "2012-11-04T04:11:53.286Z",
+            "home_roster": 12,
+            "location": "Field B",
+            "played_on": "2012-11-02T13:11:54Z",
+            "away_roster": 8,
+            "updated_on": "2012-11-04T04:11:53.286Z"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "softball.game",
+        "fields": {
+            "created_on": "2012-11-04T04:12:30.425Z",
+            "home_roster": 13,
+            "location": "Field B",
+            "played_on": "2012-11-01T12:12:12Z",
+            "away_roster": 4,
+            "updated_on": "2012-11-04T04:12:30.425Z"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "softball.game",
+        "fields": {
+            "created_on": "2012-11-04T04:12:47.658Z",
+            "home_roster": 17,
+            "location": "Field A",
+            "played_on": "2012-11-01T12:12:46Z",
+            "away_roster": 9,
+            "updated_on": "2012-11-04T04:13:53.686Z"
         }
     },
     {
@@ -836,15 +908,6 @@
     },
     {
         "pk": 4,
-        "model": "softball.roster",
-        "fields": {
-            "updated_on": "2012-11-04T03:53:35.237Z",
-            "created_on": "2012-11-04T03:53:35.237Z",
-            "team": 1
-        }
-    },
-    {
-        "pk": 5,
         "model": "softball.roster",
         "fields": {
             "updated_on": "2012-11-04T03:53:35.237Z",
@@ -922,6 +985,80 @@
             "updated_on": "2012-11-04T03:53:35.237Z",
             "created_on": "2012-11-04T03:53:35.237Z",
             "team": 3
+        }
+    },
+    {
+        "pk": 14,
+        "model": "softball.roster",
+        "fields": {
+            "updated_on": "2012-11-04T03:53:35.237Z",
+            "created_on": "2012-11-04T03:53:35.237Z",
+            "team": 4
+        }
+    },
+    {
+        "pk": 15,
+        "model": "softball.roster",
+        "fields": {
+            "updated_on": "2012-11-04T03:53:35.237Z",
+            "created_on": "2012-11-04T03:53:35.237Z",
+            "team": 4
+        }
+    },
+    {
+        "pk": 16,
+        "model": "softball.roster",
+        "fields": {
+            "updated_on": "2012-11-04T03:53:35.237Z",
+            "created_on": "2012-11-04T03:53:35.237Z",
+            "team": 4
+        }
+    },
+    {
+        "pk": 17,
+        "model": "softball.roster",
+        "fields": {
+            "updated_on": "2012-11-05T04:35:54.726Z",
+            "created_on": "2012-11-04T03:53:35.237Z",
+            "team": 4
+        }
+    },
+    {
+        "pk": 1,
+        "model": "softball.statistic",
+        "fields": {
+            "runs": 1,
+            "triples": 0,
+            "at_bats": 3,
+            "roster": 17,
+            "singles": 1,
+            "home_runs": 1,
+            "player": 62,
+            "created_on": "2012-11-04T04:34:30.731Z",
+            "walks": 0,
+            "rbis": 1,
+            "doubles": 1,
+            "strikeouts": 1,
+            "updated_on": "2012-11-04T04:34:30.731Z"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "softball.statistic",
+        "fields": {
+            "runs": 2,
+            "triples": 1,
+            "at_bats": 4,
+            "roster": 17,
+            "singles": 1,
+            "home_runs": 1,
+            "player": 66,
+            "created_on": "2012-11-05T04:35:54.729Z",
+            "walks": 1,
+            "rbis": 2,
+            "doubles": 0,
+            "strikeouts": 1,
+            "updated_on": "2012-11-05T04:35:54.729Z"
         }
     }
 ]

@@ -1,0 +1,9 @@
+{% extends 'softball/base.html' %}
+
+{% block title %}Teams{% endblock %}
+
+{% block body %}
+{% for team in teams %}
+    <p>{{ team.name }}</p>
+{% endfor %}
+{% endblock %}

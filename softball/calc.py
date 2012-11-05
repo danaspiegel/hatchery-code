@@ -20,7 +20,7 @@ def average(at_bats, hits):
         return Decimal("0")
     if at_bats < hits:
         return Decimal("0")
-    return Decimal(hits) / Decimal(at_bats)
+    return (Decimal(hits) / Decimal(at_bats)).quantize(Decimal('.001'))
 
 def on_base_percentage(at_bats, walks, hits):
     """
@@ -43,7 +43,8 @@ def on_base_percentage(at_bats, walks, hits):
     """
     if not at_bats:
         return Decimal("0")
-    return Decimal(hits + walks) / Decimal(at_bats + walks)
+    return (Decimal(hits + walks) / Decimal(at_bats + walks)
+        ).quantize(Decimal('.001'))
 
 def slugging_percentage(at_bats, hits, doubles, triples, home_runs):
     """
@@ -70,4 +71,5 @@ def slugging_percentage(at_bats, hits, doubles, triples, home_runs):
     """
     if not at_bats:
         return Decimal("0")
-    return Decimal(hits + (2 * doubles) + (3 * triples) + (4 * home_runs)) / Decimal(at_bats)
+    return (Decimal(hits + (2 * doubles) + (3 * triples) + (4 * home_runs)) /
+            Decimal(at_bats)).quantize(Decimal('.001'))
