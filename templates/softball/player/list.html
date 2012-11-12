@@ -3,18 +3,26 @@
 {% block title %}Teams{% endblock %}
 
 {% block body %}
-<table>
+<table class="table table-striped table-condensed table-hover">
+  <thead>
     <tr>
-        <th>Name</th>
-        <th>Number</th>
-        <th>Team</th>
+      <th>Number</th>
+      <th>Name</th>
+      <th>Team</th>
+      <th>Batting Average</th>
+      <th>At Bats</th>
     </tr>
+  </thead>
+  <tbody>
     {% for player in players %}
-        <tr>
-            <td>{{ player.name }}</td>
-            <td>{{ player.number }}</td>
-            <td>{{ player.team.name }}</td>
-        </tr>
+    <tr>
+      <td>{{ player.number }}</td>
+      <td>{{ player.name }}</td>
+      <td><a href="{% url team_view team_id=player.team.pk %}"</a>{{ player.team.name }}</a></td>
+      <td>{{ player.batting_average }}</td>
+      <td>{{ player.at_bats }}</td>
+    </tr>
     {% endfor %}
+  </tbody>
 </table>
 {% endblock %}

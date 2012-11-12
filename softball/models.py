@@ -13,9 +13,9 @@ class Team(django.db.models.Model):
         return self.name
 
 
-    def player_count(self):
-        pass
-
+    def record(self):
+        wins = [r.game().winner==self for r in self.rosters.all()]
+        return wins.count(True), wins.count(False)
 
 class Player(django.db.models.Model):
     created_on = django.db.models.DateTimeField(auto_now_add=True)
@@ -208,6 +208,13 @@ class Roster(django.db.models.Model):
 
     def __unicode__(self):
         return '{0} - {1}'.format(self.team.name, self.id)
+
+
+    def game(self):
+        try:
+            return self.home_game
+        except Game.DoesNotExist:
+            return self.away_game
 
 
 class Statistic(django.db.models.Model):

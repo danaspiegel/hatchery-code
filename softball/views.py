@@ -11,6 +11,21 @@ def team_list(request):
         'teams': teams,
     })
 
+
+def team_view(request, team_id):
+    """
+    Lists all teams in the Database
+    """
+    try:
+        team = models.Team.objects.get(pk=team_id)
+    except models.Team.DoesNotExist:
+        raise Http404
+    return TemplateResponse(request, 'softball/team/view.html', {
+        'team': team,
+        'record': team.record(),
+    })
+
+
 def player_list(request):
     """
     Lists all teams in the Database
