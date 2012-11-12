@@ -11,3 +11,11 @@ def team_list(request):
         'teams': teams,
     })
 
+def player_list(request):
+    """
+    Lists all teams in the Database
+    """
+    return TemplateResponse(request, 'softball/player/list.html', {
+        'players': models.Player.objects.all(),
+    })
+
