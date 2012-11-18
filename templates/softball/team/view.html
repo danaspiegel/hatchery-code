@@ -3,7 +3,6 @@
 {% block title %}Teams{% endblock %}
 
 {% block body %}
-
 <div class="row-fluid">
   <div class="span9">
     <h1>{{ team.name }}</h1>
@@ -43,18 +42,18 @@
 	<tr>
 	  <td>{{ player.number }}</td>
 	  <td>{{ player.name }}</td>
-	  <td class="right">{{ player.batting_average }}</td>
-	  <td class="right">{{ player.on_base_percentage }}</td>
-	  <td class="right">{{ player.slugging_percentage }}</td>
-	  <td class="right">{{ player.at_bats }}</td>
-	  <td class="right">{{ player.hits }}</td>
-	  <td class="right">{{ player.walks }}</td>
-	  <td class="right">{{ player.strikeouts  }}</td>
-	  <td class="right">{{ player.runs }}</td>
-	  <td class="right">{{ player.singles }}</td>
-	  <td class="right">{{ player.doubles }}</td>
-	  <td class="right">{{ player.triples }}</td>
-	  <td class="right">{{ player.home_runs }}</td>
+	  <td class="right">{{ player.batting_average|default:"-" }}</td>
+	  <td class="right">{{ player.on_base_percentage|default:"-" }}</td>
+	  <td class="right">{{ player.slugging_percentage|default:"-" }}</td>
+	  <td class="right">{{ player.at_bats|default:"-" }}</td>
+	  <td class="right">{{ player.hits|default:"-" }}</td>
+	  <td class="right">{{ player.walks|default:"-" }}</td>
+	  <td class="right">{{ player.strikeouts|default:"-" }}</td>
+	  <td class="right">{{ player.runs|default:"-" }}</td>
+	  <td class="right">{{ player.singles|default:"-" }}</td>
+	  <td class="right">{{ player.doubles|default:"-" }}</td>
+	  <td class="right">{{ player.triples|default:"-" }}</td>
+	  <td class="right">{{ player.home_runs|default:"-" }}</td>
 	</tr>
 	{% endfor %}
       </tbody>
@@ -100,6 +99,4 @@
     </table>
   </div>
 </div>
-
-
 {% endblock %}
