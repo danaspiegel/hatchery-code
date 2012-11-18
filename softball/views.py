@@ -48,8 +48,25 @@ def player_list(request):
         players = paginator.page(1)
     except EmptyPage:
         players = paginator.page(paginator.num_pages)
-#    import ipdb; ipdb.set_trace()
     return TemplateResponse(request, 'softball/player/list.html', {
         'players': players,
+    })
+
+
+def game_list(request):
+    """
+    Lists all players in the Database
+    """
+    paginator = Paginator(models.Game.objects.all().order_by('played_on'), 
+                          10)
+    page = request.GET.get('page')
+    try:
+        games = paginator.page(page)
+    except PageNotAnInteger:
+        games = paginator.page(1)
+    except EmptyPage:
+        games = paginator.page(paginator.num_pages)
+    return TemplateResponse(request, 'softball/game/list.html', {
+        'games': games,
     })
 
