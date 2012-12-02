@@ -4,54 +4,90 @@
 
 {% block body %}
 <div class="row-fluid">
-  <div class="span12">
-    <table class="table table-striped table-condensed table-hover">
-      <thead>
-	<tr>
-	  <th>Number</th>
-	  <th>Name</th>
-	  <th>Team</th>
-	  <th class="right">Batting Average</th>
-	  <th class="right">At Bats</th>
-	</tr>
-      </thead>
-      <tbody>
-	{% for player in players %}
-	<tr>
-	  <td>{{ player.number }}</td>
-	  <td>{{ player.name }}</td>
-	  <td><a href="{% url team_view team_id=player.team.pk %}">{{ player.team.name }}</a></td>
-	  <td class="right">{{ player.batting_average|default:"-" }}</td>
-	  <td class="right">{{ player.at_bats|default:"-" }}</td>
-	</tr>
-	{% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
+    <div class="span12">
+        <table class="table table-striped table-condensed table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Number</th>
+                    <th>Team</th>
+                    <th class="right">Batting Average</th>
+                    <th class="right">At Bats</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <div class="span4">
+                            <div class="pagination pagination-left pagination-small">
+                                <a class="btn" href="{% url player_create %}">Add Player</a>
+                            </div>
+                        </div>
+                        <div class="span8">
+                            <div class="pagination pagination-right pagination-small">
+                                <ul>
+                                    {% if players.paginator.num_pages > 1 %}
+                                        <li><span>{{ players.paginator.count }} Players Total</span></li>
+                                        {% if players.has_previous %}
+                                            <li>
+                                                <a href="?page={{ players.previous_page_number }}">
+                                                    &laquo;
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="disabled">
+                                                <span>&laquo;</span>
+                                            </li>
+                                        {% endif %}
 
-<div class="row-fluid">
-  <div class="span4"><div class="pagination pagination-left pagination-small">{{ players.paginator.count }} Players Total</div></div>
-  <div class="span8">
-    <div class="pagination pagination-right pagination-small">
-      <ul>
-	{% if players.has_previous %}
-	<li><a href="?page={{ players.previous_page_number }}">&laquo;</a></li>
-	{% else %}
-	<li class="disabled"><span>&laquo;</span></li>
-	{% endif %}
-	
-	{% for page_num in players.paginator.page_range %}
-	<li {% if page_num == players.number %}class="active"{% endif %}><a href="?page={{ page_num }}">{{ page_num }}</a></li>
-	{% endfor %}
-	
-	{% if players.has_next %}
-	<li><a href="?page={{ players.next_page_number }}">&raquo;</a></li>
-	{% else %}
-	<li class="disabled"><span>&raquo;</span></li>
-	{% endif %}
-      </ul>
+                                        {% for page_num in players.paginator.page_range %}
+                                            <li {% if page_num == players.number %}class="active"{% endif %}>
+                                                <a href="?page={{ page_num }}">
+                                                    {{ page_num }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+
+                                        {% if players.has_next %}
+                                            <li>
+                                                <a href="?page={{ players.next_page_number }}">
+                                                    &raquo;
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="disabled">
+                                                <span>&raquo;</span>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+            <tbody>
+            {% for player in players %}
+                <tr>
+                    <td>
+                        <a href="{% url player_view player_id=player.pk %}">
+                            {{ player.name }}
+                        </a>
+                    </td>
+                    <td>{{ player.number }}</td>
+                    <td>
+                        <a href="{% url team_view team_id=player.team.pk %}">
+                            {{ player.team.name }}
+                        </a>
+                    </td>
+                    <td class="right">
+                        {{ player.batting_average|default:"-" }}
+                    </td>
+                    <td class="right">{{ player.at_bats|default:"-" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-  </div>
 </div>
 {% endblock %}

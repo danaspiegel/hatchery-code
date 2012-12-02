@@ -1,0 +1,78 @@
+[
+    {
+        "pk": 1, 
+        "model": "softball.statistic", 
+        "fields": {
+            "runs": 1, 
+            "triples": 0, 
+            "at_bats": 5, 
+            "strikeouts": 1, 
+            "singles": 1, 
+            "home_runs": 1, 
+            "player": 62, 
+            "created_on": "2012-11-04T04:34:30.731Z", 
+            "walks": 0, 
+            "rbis": 1, 
+            "roster": 17, 
+            "doubles": 1, 
+            "updated_on": "2012-11-05T06:16:21.405Z"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "softball.statistic", 
+        "fields": {
+            "runs": 2, 
+            "triples": 1, 
+            "at_bats": 4, 
+            "strikeouts": 1, 
+            "singles": 1, 
+            "home_runs": 1, 
+            "player": 66, 
+            "created_on": "2012-11-05T04:35:54.729Z", 
+            "walks": 1, 
+            "rbis": 2, 
+            "roster": 17, 
+            "doubles": 0, 
+            "updated_on": "2012-11-05T04:35:54.729Z"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "softball.statistic", 
+        "fields": {
+            "runs": 3, 
+            "triples": 0, 
+            "at_bats": 5, 
+            "strikeouts": 0, 
+            "singles": 1, 
+            "home_runs": 0, 
+            "player": 62, 
+            "created_on": "2012-11-05T04:44:19.140Z", 
+            "walks": 1, 
+            "rbis": 2, 
+            "roster": 16, 
+            "doubles": 1, 
+            "updated_on": "2012-11-05T06:16:21.409Z"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "softball.statistic", 
+        "fields": {
+            "runs": 1, 
+            "triples": 0, 
+            "at_bats": 4, 
+            "strikeouts": 0, 
+            "singles": 2, 
+            "home_runs": 1, 
+            "player": 66, 
+            "created_on": "2012-11-05T04:44:19.141Z", 
+            "walks": 0, 
+            "rbis": 1, 
+            "roster": 16, 
+            "doubles": 0, 
+            "updated_on": "2012-11-05T04:44:19.141Z"
+        }
+    }
+]
