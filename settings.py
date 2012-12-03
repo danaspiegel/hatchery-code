@@ -102,3 +102,5 @@ LOGGING = {
         },
     }
 }
+
+MANDRILL_API_KEY = '1fdd2499-cd35-4496-b38c-7339a24c0a49'
