@@ -6,7 +6,7 @@ import calc
 class Team(django.db.models.Model):
     created_on = django.db.models.DateTimeField(auto_now_add=True)
     updated_on = django.db.models.DateTimeField(auto_now=True)
-    name = django.db.models.CharField(max_length=150, db_index=True)
+    name = django.db.models.CharField('Team Name', max_length=150, db_index=True)
 
 
     def __unicode__(self):
