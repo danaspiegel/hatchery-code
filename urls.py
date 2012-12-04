@@ -1,3 +1,4 @@
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import patterns, include, url
 from django.views.generic.simple import direct_to_template
 
@@ -16,3 +17,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^softball/', include('softball.urls')),
 )
+
+urlpatterns += staticfiles_urlpatterns()
