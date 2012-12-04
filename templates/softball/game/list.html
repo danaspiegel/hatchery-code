@@ -15,6 +15,57 @@
                     <th class="right">Score</th>
                 </tr>
             </thead>
+            <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <div class="span4">
+                            <div class="pagination pagination-left pagination-small">
+                                <a class="btn" href="{% url game_create %}">Add Game</a>
+                            </div>
+                        </div>
+                        <div class="span8">
+                            <div class="pagination pagination-right pagination-small">
+                                <ul>
+                                    {% if games.paginator.num_pages > 1 %}
+                                        <li><span>{{ games.paginator.count }} Games Total</span></li>
+                                        {% if games.has_previous %}
+                                            <li>
+                                                <a href="?page={{ games.previous_page_number }}">
+                                                    &laquo;
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="disabled">
+                                                <span>&laquo;</span>
+                                            </li>
+                                        {% endif %}
+
+                                        {% for page_num in games.paginator.page_range %}
+                                            <li {% if page_num == games.number %}class="active"{% endif %}>
+                                                <a href="?page={{ page_num }}">
+                                                    {{ page_num }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+
+                                        {% if games.has_next %}
+                                            <li>
+                                                <a href="?page={{ games.next_page_number }}">
+                                                    &raquo;
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="disabled">
+                                                <span>&raquo;</span>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
             <tbody>
                 {% for game in games %}
                     <tr>
@@ -47,31 +98,6 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-</div>
-
-<div class="row-fluid">
-    <div class="span4"><div class="pagination pagination-left pagination-small">{{ games.paginator.count }} Games Total</div></div>
-    <div class="span8">
-        <div class="pagination pagination-right pagination-small">
-            <ul>
-        {% if games.has_previous %}
-        <li><a href="?page={{ games.previous_page_number }}">&laquo;</a></li>
-        {% else %}
-        <li class="disabled"><span>&laquo;</span></li>
-        {% endif %}
-        
-        {% for page_num in games.paginator.page_range %}
-        <li {% if page_num == games.number %}class="active"{% endif %}><a href="?page={{ page_num }}">{{ page_num }}</a></li>
-        {% endfor %}
-        
-        {% if games.has_next %}
-        <li><a href="?page={{ games.next_page_number }}">&raquo;</a></li>
-        {% else %}
-        <li class="disabled"><span>&raquo;</span></li>
-        {% endif %}
-            </ul>
-        </div>
     </div>
 </div>
 {% endblock %}

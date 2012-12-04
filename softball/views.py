@@ -1,15 +1,11 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import Http404
-from django.shortcuts import redirect, render_to_response
-from django.template import RequestContext
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
 import models, forms
 
 def team_list(request):
-    """
-    Lists all teams in the Database
-    """
     paginator = Paginator(models.Team.objects.all().order_by('name'),
                           10)
     page = request.GET.get('page')
@@ -25,9 +21,6 @@ def team_list(request):
 
 
 def team_view(request, team_id):
-    """
-    Shows the details of a specified team
-    """
     try:
         team = models.Team.objects.get(pk=team_id)
     except models.Team.DoesNotExist:
@@ -38,28 +31,33 @@ def team_view(request, team_id):
     })
 
 
-def team_edit(request, team_id=None):
-    """
-    Edits an existing team or creates a new team
-    """
-    if team_id:
-        try:
-            team = models.Team.objects.get(pk=team_id)
-        except models.Team.DoesNotExist:
-            raise Http404
+def team_create(request):
+    if request.method == 'POST':
+        team_form = forms.TeamForm(request.POST)
+        if team_form.is_valid():
+            team = team_form.save()
+            return redirect('team_view', team_id=team.id)
     else:
-        team = models.Team()
+        team_form = forms.TeamForm()
+
+    return TemplateResponse(request, 'softball/team/create.html', {
+        'team_form': team_form,
+    })
+
+
+def team_edit(request, team_id=None):
+    try:
+        team = models.Team.objects.get(pk=team_id)
+    except models.Team.DoesNotExist:
+        raise Http404
 
     if request.method == 'POST':
         team_form = forms.TeamForm(request.POST, instance=team)
-#        player_formset = forms.TeamPlayerFormSet(request.POST, instance=team)
         if team_form.is_valid():
             team = team_form.save()
-#            player_formset.save()
             return redirect('team_view', team_id=team.id)
     else:
         team_form = forms.TeamForm(instance=team)
-#        player_formset = forms.TeamPlayerFormSet(instance=team)
 
     return TemplateResponse(request, 'softball/team/edit.html', {
         'team': team,
@@ -69,10 +67,7 @@ def team_edit(request, team_id=None):
 
 
 def player_list(request):
-    """
-    Lists all players in the Database
-    """
-    paginator = Paginator(models.Player.objects.all().order_by('name'), 
+    paginator = Paginator(models.Player.objects.all().order_by('name'),
                           10)
     page = request.GET.get('page')
     try:
@@ -87,9 +82,6 @@ def player_list(request):
 
 
 def player_view(request, player_id):
-    """
-    Shows the details of a specified team
-    """
     try:
         player = models.Player.objects.get(pk=player_id)
     except models.Team.DoesNotExist:
@@ -99,27 +91,37 @@ def player_view(request, player_id):
     })
 
 
-def player_edit(request, player_id=None):
-    """
-    Shows the details of a specified team
-    """
-    if player_id:
+def player_create(request):
+    # if there's a team_id specified, use that team as the preset team for
+    # this player
+    team = models.Team()
+    if request.GET.has_key('team_id'):
         try:
-            player = models.Player.objects.get(pk=player_id)
-        except models.Player.DoesNotExist:
-            raise Http404
-    else:
-        # if there's a team_id specified, use that team as the preset team for
-        # this player
-        team = models.Team()
-        if request.GET.has_key('team_id'):
-            try:
-                team = models.Team.objects.get(pk=request.GET['team_id'])
-            except models.Team.DoesNotExist, e:
-                # Team doesn't exist, so just use an empty team
-                pass
-        player = models.Player(team=team)
+            team = models.Team.objects.get(pk=request.GET['team_id'])
+        except models.Team.DoesNotExist, e:
+            # Team doesn't exist, so just use an empty team
+            pass
+    player = models.Player(team=team)
 
+    if request.method == 'POST':
+        player_form = forms.PlayerForm(request.POST, instance=player)
+        if player_form.is_valid():
+            player = player_form.save()
+            return redirect('player_view', player_id=player.id)
+    else:
+        player_form = forms.PlayerForm(instance=player)
+
+    return TemplateResponse(request, 'softball/player/create.html', {
+        'player': player,
+        'player_form': player_form,
+    })
+
+
+def player_edit(request, player_id):
+    try:
+        player = models.Player.objects.get(pk=player_id)
+    except models.Player.DoesNotExist:
+        raise Http404
     if request.method == 'POST':
         player_form = forms.PlayerForm(request.POST, instance=player)
         if player_form.is_valid():
@@ -135,10 +137,7 @@ def player_edit(request, player_id=None):
 
 
 def game_list(request):
-    """
-    Lists all players in the Database
-    """
-    paginator = Paginator(models.Game.objects.all().order_by('played_on'), 
+    paginator = Paginator(models.Game.objects.all().order_by('played_on'),
                           10)
     page = request.GET.get('page')
     try:
@@ -153,9 +152,6 @@ def game_list(request):
 
 
 def game_view(request, game_id):
-    """
-    Shows the details of a specified team
-    """
     try:
         game = models.Game.objects.get(pk=game_id)
     except models.Game.DoesNotExist:
@@ -167,17 +163,25 @@ def game_view(request, game_id):
     })
 
 
-def game_edit(request, game_id=None):
-    """
-    Shows the details of a specified team
-    """
-    if game_id:
-        try:
-            game = models.Game.objects.get(pk=game_id)
-        except models.Player.DoesNotExist:
-            raise Http404
+def game_create(request):
+    if request.method == 'POST':
+        game_form = forms.GameForm(request.POST)
+        if game_form.is_valid():
+            game = game_form.save()
+            return redirect('game_view', game_id=game.id)
     else:
-        game = models.Game()
+        game_form = forms.GameForm()
+
+    return TemplateResponse(request, 'softball/game/create.html', {
+        'game_form': game_form,
+    })
+
+
+def game_edit(request, game_id):
+    try:
+        game = models.Game.objects.get(pk=game_id)
+    except models.Player.DoesNotExist:
+        raise Http404
 
     if request.method == 'POST':
         game_form = forms.GameForm(request.POST, instance=game)
