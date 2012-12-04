@@ -1,0 +1,38 @@
+[
+    {
+        "pk": 1, 
+        "model": "softball.team", 
+        "fields": {
+            "updated_on": "2012-11-04T03:21:04.572Z", 
+            "created_on": "2012-11-04T03:21:04.572Z", 
+            "name": "Yankees"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "softball.team", 
+        "fields": {
+            "updated_on": "2012-11-04T03:21:30.677Z", 
+            "created_on": "2012-11-04T03:21:30.677Z", 
+            "name": "Mets"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "softball.team", 
+        "fields": {
+            "updated_on": "2012-11-04T03:21:39.553Z", 
+            "created_on": "2012-11-04T03:21:39.553Z", 
+            "name": "Dodgers"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "softball.team", 
+        "fields": {
+            "updated_on": "2012-11-04T04:02:41.754Z", 
+            "created_on": "2012-11-04T04:02:41.754Z", 
+            "name": "Giants"
+        }
+    }
+]
