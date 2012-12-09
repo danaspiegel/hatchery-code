@@ -8,14 +8,13 @@ class Team(django.db.models.Model):
     updated_on = django.db.models.DateTimeField(auto_now=True)
     name = django.db.models.CharField('Team Name', max_length=150, db_index=True)
 
-
     def __unicode__(self):
         return self.name
-
 
     def record(self):
         wins = [r.game().winner==self for r in self.rosters.all()]
         return wins.count(True), wins.count(False)
+
 
 class Player(django.db.models.Model):
     created_on = django.db.models.DateTimeField(auto_now_add=True)
@@ -28,10 +27,7 @@ class Player(django.db.models.Model):
         ordering = ["name", ]
 
     def __unicode__(self):
-        return u'{0} #{1} - {2}'.format(self.name,
-                                        self.number or 'N/A',
-                                        self.team.name)
-
+        return u'{0} #{1}'.format(self.name, self.number or 'N/A')
 
     def at_bats(self):
         """
@@ -40,7 +36,6 @@ class Player(django.db.models.Model):
         return self.statistics.aggregate(
             s=django.db.models.Sum('at_bats'))['s'] or 0
     at_bats.short_description = u'AB'
-
 
     def hits(self):
         """
@@ -54,7 +49,6 @@ class Player(django.db.models.Model):
             ).values()))
     hits.short_description = u'H'
 
-
     def walks(self):
         """
         Returns the total number of walks for this player
@@ -62,7 +56,6 @@ class Player(django.db.models.Model):
         return self.statistics.aggregate(
             s=django.db.models.Sum('walks'))['s'] or 0
     walks.short_description = u'BB'
-
 
     def strikeouts(self):
         """
@@ -72,7 +65,6 @@ class Player(django.db.models.Model):
             s=django.db.models.Sum('strikeouts'))['s'] or 0
     strikeouts.short_description = u'K'
 
-
     def runs(self):
         """
         Returns the total number of runs for this player
@@ -80,7 +72,6 @@ class Player(django.db.models.Model):
         return self.statistics.aggregate(
             s=django.db.models.Sum('runs'))['s'] or 0
     runs.short_description = u'R'
-
 
     def singles(self):
         """
@@ -90,7 +81,6 @@ class Player(django.db.models.Model):
             s=django.db.models.Sum('singles'))['s'] or 0
     singles.short_description = u'1B'
 
-
     def doubles(self):
         """
         Returns the total number of doubled for this player
@@ -98,7 +88,6 @@ class Player(django.db.models.Model):
         return self.statistics.aggregate(
             s=django.db.models.Sum('doubles'))['s'] or 0
     doubles.short_description = u'2B'
-
 
     def triples(self):
         """
@@ -108,7 +97,6 @@ class Player(django.db.models.Model):
             s=django.db.models.Sum('triples'))['s'] or 0
     triples.short_description = u'3B'
 
-
     def home_runs(self):
         """
         Returns the total number of home runs for this player
@@ -116,7 +104,6 @@ class Player(django.db.models.Model):
         return self.statistics.aggregate(
             s=django.db.models.Sum('home_runs'))['s'] or 0
     home_runs.short_description = u'HR'
-
 
     def rbis(self):
         """
@@ -126,20 +113,18 @@ class Player(django.db.models.Model):
             s=django.db.models.Sum('rbis'))['s'] or 0
     rbis.short_description = u'RBI'
 
-
     def batting_average(self):
         if self.hits() > self.at_bats():
             return 0
         return calc.average(self.at_bats(), self.hits())
     batting_average.short_description = u'AVG'
 
-
     def on_base_percentage(self):
         if self.hits() > self.at_bats():
             return 0
         return calc.on_base_percentage(
             self.at_bats(), self.walks(), self.hits())
-    on_base_percentage.short_description = u'OB%'
+    on_base_percentage.short_description = u'OB'
 
     def slugging_percentage(self):
         if self.hits() > self.at_bats():
@@ -147,7 +132,7 @@ class Player(django.db.models.Model):
         return calc.slugging_percentage(self.at_bats(), self.singles(),
                                         self.doubles(), self.triples(),
                                         self.home_runs())
-    slugging_percentage.short_description = u'SLG%'
+    slugging_percentage.short_description = u'SLG'
 
 
 class Game(django.db.models.Model):
@@ -160,10 +145,8 @@ class Game(django.db.models.Model):
     away_roster = django.db.models.OneToOneField('Roster',
                                                  related_name='away_game')
 
-
     def __unicode__(self):
-        return u'{0} - {1}'.format(self.location, self.played_on)
-
+        return u'{0} on {1}'.format(self.location, self.played_on, )
 
     @property
     def winner(self):
@@ -171,7 +154,6 @@ class Game(django.db.models.Model):
             return self.away_roster.team
         else:
             return self.home_roster.team
-
 
     @property
     def final_score(self):
@@ -181,7 +163,6 @@ class Game(django.db.models.Model):
         """
         return self.away_score, self.home_score
 
-
     @property
     def home_score(self):
         """
@@ -189,7 +170,6 @@ class Game(django.db.models.Model):
         """
         return self.home_roster.player_statistics.aggregate(
             s=django.db.models.Sum('runs'))['s'] or 0
-
 
     @property
     def away_score(self):
@@ -205,10 +185,8 @@ class Roster(django.db.models.Model):
     updated_on = django.db.models.DateTimeField(auto_now=True)
     team = django.db.models.ForeignKey('Team', related_name='rosters')
 
-
     def __unicode__(self):
         return '{0} - {1}'.format(self.team.name, self.id)
-
 
     def game(self):
         try:
@@ -233,25 +211,39 @@ class Statistic(django.db.models.Model):
     roster = django.db.models.ForeignKey('Roster',
                                          related_name='player_statistics')
 
+    class Meta:
+        unique_together = ('player', 'roster', )
 
     def __unicode__(self):
         return u'{name} ({roster_id}): AB:{at_bats} R:{runs} 1B:{singles} ' \
                u'2B:{doubles} 3B:{triples} HR:{home_runs} RBI:{rbis} ' \
                u'BB:{walks} K:{strikeouts}'.format(
-            name=self.player.name, roster_id=self.roster_id,
-            at_bats=self.at_bats, runs=self.runs, singles=self.singles,
-            doubles=self.doubles, triples=self.triples,
-            home_runs=self.home_runs, walks=self.walks,
-            strikeouts=self.strikeouts, rbis=self.rbis)
+               name=self.player.name, roster_id=self.roster_id,
+               at_bats=self.at_bats, runs=self.runs, singles=self.singles,
+               doubles=self.doubles, triples=self.triples,
+               home_runs=self.home_runs, walks=self.walks,
+               strikeouts=self.strikeouts, rbis=self.rbis)
 
-
-    @property
     def hits(self):
         return self.singles + self.doubles + self.triples + self.home_runs
 
-
-    @property
     def batting_average(self):
-        if self.hits > self.at_bats:
+        if self.hits() > self.at_bats:
             return 0
-        return calc.average(self.at_bats, self.hits)
+        return calc.average(self.at_bats, self.hits())
+    batting_average.short_description = u'AVG'
+
+    def on_base_percentage(self):
+        if self.hits() > self.at_bats:
+            return 0
+        return calc.on_base_percentage(
+            self.at_bats, self.walks, self.hits())
+    on_base_percentage.short_description = u'OB'
+
+    def slugging_percentage(self):
+        if self.hits() > self.at_bats:
+            return 0
+        return calc.slugging_percentage(self.at_bats, self.singles,
+                                        self.doubles, self.triples,
+                                        self.home_runs)
+    slugging_percentage.short_description = u'SLG'
