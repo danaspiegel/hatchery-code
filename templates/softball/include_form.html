@@ -17,11 +17,12 @@
         </label>
         <div class="controls">
             {{ field }}
-            <span class="help-inline">
-                {% for error in field.errors %}
-                    {{ error|escape }}
-                {% endfor %}
-            </span>
+            <span class="help-inline">{{ field.errors|join:", "|escape }}</span>
+            {% if field.help_text %}
+                <br/>
+                <span class="help-inline"><em>{{ field.help_text|escape }}</em>
+                </span>
+            {% endif %}
         </div>
     </div>
 {% endfor %}
