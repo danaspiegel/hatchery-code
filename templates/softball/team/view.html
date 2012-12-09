@@ -5,6 +5,8 @@
 {% block body %}
 <div class="page-header">
     <p class="pull-right">
+        <a class="btn btn-danger" href="{% url team_delete team_id=team.id %}">
+            Delete Team</a>
         <a class="btn" href="{% url team_edit team_id=team.id %}">Edit Team</a>
     </p>
     <h1>
@@ -19,9 +21,10 @@
 <div class="row-fluid">
     <div class="span12">
         <h3>Players</h3>
-        {% include 'softball/team/part.player_list.html' %}
+        {% include 'softball/team/part.player_list.html' with players=team.players %}
         <p>
-            <a class="btn" href="{% url player_create %}">Add Player</a>
+            <a class="btn" href="{% url player_create %}?team_id={{ team.id }}">
+                Add Player</a>
         </p>
     </div>
 </div>
