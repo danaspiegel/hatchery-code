@@ -2,8 +2,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
+from django.contrib import messages
 
-import models, forms
+import models
+import forms
+
 
 def team_list(request):
     paginator = Paginator(models.Team.objects.all().order_by('name'),
@@ -36,6 +39,7 @@ def team_create(request):
         team_form = forms.TeamForm(request.POST)
         if team_form.is_valid():
             team = team_form.save()
+            messages.success(request, 'Team {0} created'.format(team.name))
             return redirect('team_view', team_id=team.id)
     else:
         team_form = forms.TeamForm()
@@ -55,6 +59,7 @@ def team_edit(request, team_id=None):
         team_form = forms.TeamForm(request.POST, instance=team)
         if team_form.is_valid():
             team = team_form.save()
+            messages.success(request, 'Team {0} updated'.format(team.name))
             return redirect('team_view', team_id=team.id)
     else:
         team_form = forms.TeamForm(instance=team)
@@ -64,6 +69,16 @@ def team_edit(request, team_id=None):
         'record': team.record(),
         'team_form': team_form,
     })
+
+
+def team_delete(request, team_id):
+    try:
+        team = models.Team.objects.get(pk=team_id)
+    except models.Player.DoesNotExist:
+        raise Http404
+    team.delete()
+    messages.success(request, 'Team {0} deleted'.format(team.name))
+    return redirect('team_list')
 
 
 def player_list(request):
@@ -84,7 +99,7 @@ def player_list(request):
 def player_view(request, player_id):
     try:
         player = models.Player.objects.get(pk=player_id)
-    except models.Team.DoesNotExist:
+    except models.Player.DoesNotExist:
         raise Http404
     return TemplateResponse(request, 'softball/player/view.html', {
         'player': player,
@@ -95,7 +110,7 @@ def player_create(request):
     # if there's a team_id specified, use that team as the preset team for
     # this player
     team = models.Team()
-    if request.GET.has_key('team_id'):
+    if 'team_id' in request.GET:
         try:
             team = models.Team.objects.get(pk=request.GET['team_id'])
         except models.Team.DoesNotExist, e:
@@ -126,6 +141,7 @@ def player_edit(request, player_id):
         player_form = forms.PlayerForm(request.POST, instance=player)
         if player_form.is_valid():
             player = player_form.save()
+            messages.success(request, 'Player {0} updated'.format(player.name))
             return redirect('player_view', player_id=player.id)
     else:
         player_form = forms.PlayerForm(instance=player)
@@ -134,6 +150,16 @@ def player_edit(request, player_id):
         'player': player,
         'player_form': player_form,
     })
+
+
+def player_delete(request, player_id):
+    try:
+        player = models.Player.objects.get(pk=player_id)
+    except models.Player.DoesNotExist:
+        raise Http404
+    player.delete()
+    messages.success(request, 'Player {0} deleted'.format(player.name))
+    return redirect('player_list')
 
 
 def game_list(request):
@@ -168,6 +194,7 @@ def game_create(request):
         game_form = forms.GameForm(request.POST)
         if game_form.is_valid():
             game = game_form.save()
+            messages.success(request, 'Game {0} created'.format(game))
             return redirect('game_view', game_id=game.id)
     else:
         game_form = forms.GameForm()
@@ -187,6 +214,7 @@ def game_edit(request, game_id):
         game_form = forms.GameForm(request.POST, instance=game)
         if game_form.is_valid():
             game = game_form.save()
+            messages.success(request, 'Game {0} updated'.format(game))
             return redirect('game_view', game_id=game.id)
     else:
         game_form = forms.GameForm(instance=game)
@@ -197,3 +225,14 @@ def game_edit(request, game_id):
     })
 
 
+def game_delete(request, game_id):
+    try:
+        game = models.Game.objects.get(pk=game_id)
+    except models.Game.DoesNotExist:
+        raise Http404
+    # be sure to delete the rosters first!
+    game.home_roster.delete()
+    game.away_roster.delete()
+    game.delete()
+    messages.success(request, 'Game {0} deleted'.format(game))
+    return redirect('game_list')
