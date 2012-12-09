@@ -6,13 +6,14 @@ import calc
 class Team(django.db.models.Model):
     created_on = django.db.models.DateTimeField(auto_now_add=True)
     updated_on = django.db.models.DateTimeField(auto_now=True)
-    name = django.db.models.CharField('Team Name', max_length=150, db_index=True)
+    name = django.db.models.CharField('Team Name', max_length=150,
+                                      db_index=True)
 
     def __unicode__(self):
         return self.name
 
     def record(self):
-        wins = [r.game().winner==self for r in self.rosters.all()]
+        wins = [r.game().winner == self for r in self.rosters.all()]
         return wins.count(True), wins.count(False)
 
 
@@ -21,7 +22,8 @@ class Player(django.db.models.Model):
     updated_on = django.db.models.DateTimeField(auto_now=True)
     name = django.db.models.CharField(max_length=150, unique=True)
     number = django.db.models.PositiveIntegerField()
-    team = django.db.models.ForeignKey('Team', related_name='players')
+    team = django.db.models.ForeignKey('Team', related_name='players',
+                                       on_delete=django.db.models.CASCADE)
 
     class Meta:
         ordering = ["name", ]
@@ -37,17 +39,33 @@ class Player(django.db.models.Model):
             s=django.db.models.Sum('at_bats'))['s'] or 0
     at_bats.short_description = u'AB'
 
+    def runs(self):
+        """
+        Returns the total number of runs for this player
+        """
+        return self.statistics.aggregate(
+            s=django.db.models.Sum('runs'))['s'] or 0
+    runs.short_description = u'R'
+
     def hits(self):
         """
         Returns the total singles, doubles, triples, and home_runs
         """
         return sum(filter(None,
-            self.statistics.aggregate(django.db.models.Sum('singles'),
-                                      django.db.models.Sum('doubles'),
-                                      django.db.models.Sum('triples'),
-                                      django.db.models.Sum('home_runs')
-            ).values()))
+                          self.statistics.aggregate(
+                              django.db.models.Sum('singles'),
+                              django.db.models.Sum('doubles'),
+                              django.db.models.Sum('triples'),
+                              django.db.models.Sum('home_runs')).values()))
     hits.short_description = u'H'
+
+    def rbis(self):
+        """
+        Returns the total number of rbis for this player
+        """
+        return self.statistics.aggregate(
+            s=django.db.models.Sum('rbis'))['s'] or 0
+    rbis.short_description = u'RBI'
 
     def walks(self):
         """
@@ -63,15 +81,7 @@ class Player(django.db.models.Model):
         """
         return self.statistics.aggregate(
             s=django.db.models.Sum('strikeouts'))['s'] or 0
-    strikeouts.short_description = u'K'
-
-    def runs(self):
-        """
-        Returns the total number of runs for this player
-        """
-        return self.statistics.aggregate(
-            s=django.db.models.Sum('runs'))['s'] or 0
-    runs.short_description = u'R'
+    strikeouts.short_description = u'SO'
 
     def singles(self):
         """
@@ -104,14 +114,6 @@ class Player(django.db.models.Model):
         return self.statistics.aggregate(
             s=django.db.models.Sum('home_runs'))['s'] or 0
     home_runs.short_description = u'HR'
-
-    def rbis(self):
-        """
-        Returns the total number of rbis for this player
-        """
-        return self.statistics.aggregate(
-            s=django.db.models.Sum('rbis'))['s'] or 0
-    rbis.short_description = u'RBI'
 
     def batting_average(self):
         if self.hits() > self.at_bats():
@@ -149,11 +151,19 @@ class Game(django.db.models.Model):
         return u'{0} on {1}'.format(self.location, self.played_on, )
 
     @property
+    def is_tie(self):
+        away_score, home_score = self.final_score
+        return home_score == away_score
+
+    @property
     def winner(self):
-        if self.away_score > self.home_score:
+        away_score, home_score = self.final_score
+        if away_score > home_score:
             return self.away_roster.team
-        else:
+        elif away_score < home_score:
             return self.home_roster.team
+        else:
+            return None
 
     @property
     def final_score(self):
@@ -183,7 +193,8 @@ class Game(django.db.models.Model):
 class Roster(django.db.models.Model):
     created_on = django.db.models.DateTimeField(auto_now_add=True)
     updated_on = django.db.models.DateTimeField(auto_now=True)
-    team = django.db.models.ForeignKey('Team', related_name='rosters')
+    team = django.db.models.ForeignKey('Team', related_name='rosters',
+                                       on_delete=django.db.models.CASCADE)
 
     def __unicode__(self):
         return '{0} - {1}'.format(self.team.name, self.id)
@@ -198,18 +209,20 @@ class Roster(django.db.models.Model):
 class Statistic(django.db.models.Model):
     created_on = django.db.models.DateTimeField(auto_now_add=True)
     updated_on = django.db.models.DateTimeField(auto_now=True)
-    player = django.db.models.ForeignKey('Player', related_name='statistics')
+    player = django.db.models.ForeignKey('Player', related_name='statistics',
+                                         on_delete=django.db.models.CASCADE)
     at_bats = django.db.models.PositiveIntegerField(u'AB', default=0)
     runs = django.db.models.PositiveIntegerField('R', default=0)
+    rbis = django.db.models.PositiveIntegerField('RBI', default=0)
+    walks = django.db.models.PositiveIntegerField('BB', default=0)
+    strikeouts = django.db.models.PositiveIntegerField('SO', default=0)
     singles = django.db.models.PositiveIntegerField('1B', default=0)
     doubles = django.db.models.PositiveIntegerField('2B', default=0)
     triples = django.db.models.PositiveIntegerField('3B', default=0)
     home_runs = django.db.models.PositiveIntegerField('HR', default=0)
-    rbis = django.db.models.PositiveIntegerField('RBI', default=0)
-    walks = django.db.models.PositiveIntegerField('BB', default=0)
-    strikeouts = django.db.models.PositiveIntegerField('K', default=0)
     roster = django.db.models.ForeignKey('Roster',
-                                         related_name='player_statistics')
+                                         related_name='player_statistics',
+                                         on_delete=django.db.models.CASCADE)
 
     class Meta:
         unique_together = ('player', 'roster', )

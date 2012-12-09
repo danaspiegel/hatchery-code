@@ -22,6 +22,7 @@ def average(at_bats, hits):
         return Decimal("0")
     return (Decimal(hits) / Decimal(at_bats)).quantize(Decimal('.001'))
 
+
 def on_base_percentage(at_bats, walks, hits):
     """
     OBP = (H + BB) / (AB + BB)
@@ -43,8 +44,9 @@ def on_base_percentage(at_bats, walks, hits):
     """
     if not at_bats:
         return Decimal("0")
-    return (Decimal(hits + walks) / Decimal(at_bats + walks)
-        ).quantize(Decimal('.001'))
+    return (Decimal(hits + walks) / Decimal(at_bats + walks)).quantize(
+        Decimal('.001'))
+
 
 def slugging_percentage(at_bats, hits, doubles, triples, home_runs):
     """

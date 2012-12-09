@@ -15,7 +15,8 @@
             {% endwith %}
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Add Player</button>
-                <a class="btn" href="{% url player_list %}">Cancel</a>
+                <a class="btn" href="
+                    {% if next_url %}{{ next_url }}{% else %}{% url player_list %}{% endif %}">Cancel</a>
             </div>
         </div>
     </div>

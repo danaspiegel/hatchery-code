@@ -23,7 +23,7 @@
         <h3>Players</h3>
         {% include 'softball/team/part.player_list.html' with players=team.players %}
         <p>
-            <a class="btn" href="{% url player_create %}?team_id={{ team.id }}">
+            <a class="btn" href="{% url player_create %}?team_id={{ team.id }}&next={% url team_view team_id=team.id %}">
                 Add Player</a>
         </p>
     </div>

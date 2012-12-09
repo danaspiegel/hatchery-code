@@ -40,7 +40,7 @@ def team_create(request):
         if team_form.is_valid():
             team = team_form.save()
             messages.success(request, 'Team {0} created'.format(team.name))
-            return redirect('team_view', team_id=team.id)
+            return redirect('team_edit', team_id=team.id)
     else:
         team_form = forms.TeamForm()
 
@@ -49,7 +49,7 @@ def team_create(request):
     })
 
 
-def team_edit(request, team_id=None):
+def team_edit(request, team_id):
     try:
         team = models.Team.objects.get(pk=team_id)
     except models.Team.DoesNotExist:
@@ -57,17 +57,21 @@ def team_edit(request, team_id=None):
 
     if request.method == 'POST':
         team_form = forms.TeamForm(request.POST, instance=team)
-        if team_form.is_valid():
+        player_formset = forms.TeamPlayerFormSet(request.POST, instance=team)
+        if team_form.is_valid() and player_formset.is_valid():
             team = team_form.save()
             messages.success(request, 'Team {0} updated'.format(team.name))
+            player_formset.save()
             return redirect('team_view', team_id=team.id)
     else:
         team_form = forms.TeamForm(instance=team)
+        player_formset = forms.TeamPlayerFormSet(instance=team)
 
     return TemplateResponse(request, 'softball/team/edit.html', {
         'team': team,
         'record': team.record(),
         'team_form': team_form,
+        'player_formset': player_formset,
     })
 
 
@@ -118,10 +122,16 @@ def player_create(request):
             pass
     player = models.Player(team=team)
 
+    # if provided get the "next" url to send the user to on success or cancel
+    next_url = request.GET.get('next')
+
     if request.method == 'POST':
         player_form = forms.PlayerForm(request.POST, instance=player)
         if player_form.is_valid():
             player = player_form.save()
+            messages.success(request, 'Player {0} created'.format(player))
+            if next_url:
+                return redirect(next_url)
             return redirect('player_view', player_id=player.id)
     else:
         player_form = forms.PlayerForm(instance=player)
@@ -129,6 +139,7 @@ def player_create(request):
     return TemplateResponse(request, 'softball/player/create.html', {
         'player': player,
         'player_form': player_form,
+        'next_url': next_url,
     })
 
 
@@ -139,16 +150,21 @@ def player_edit(request, player_id):
         raise Http404
     if request.method == 'POST':
         player_form = forms.PlayerForm(request.POST, instance=player)
-        if player_form.is_valid():
+        statistic_formset = forms.PlayerStatisticModelFormSet(request.POST,
+                                                              instance=player)
+        if player_form.is_valid() and statistic_formset.is_valid():
             player = player_form.save()
+            statistic_formset.save()
             messages.success(request, 'Player {0} updated'.format(player.name))
             return redirect('player_view', player_id=player.id)
     else:
         player_form = forms.PlayerForm(instance=player)
+        statistic_formset = forms.PlayerStatisticModelFormSet(instance=player)
 
     return TemplateResponse(request, 'softball/player/edit.html', {
         'player': player,
         'player_form': player_form,
+        'statistic_formset': statistic_formset,
     })
 
 
@@ -193,12 +209,22 @@ def game_create(request):
     if request.method == 'POST':
         game_form = forms.GameForm(request.POST)
         if game_form.is_valid():
-            game = game_form.save()
+            # home_team must be assigned a roster
+            home_roster = models.Roster(
+                team=game_form.cleaned_data['home_team'])
+            home_roster.save()
+            # away_team must be assigned a roster
+            away_roster = models.Roster(
+                team=game_form.cleaned_data['away_team'])
+            away_roster.save()
+            game = game_form.save(commit=False)
+            game.home_roster = home_roster
+            game.away_roster = away_roster
+            game.save()
             messages.success(request, 'Game {0} created'.format(game))
-            return redirect('game_view', game_id=game.id)
+            return redirect('game_edit', game_id=game.id)
     else:
         game_form = forms.GameForm()
-
     return TemplateResponse(request, 'softball/game/create.html', {
         'game_form': game_form,
     })
@@ -210,18 +236,49 @@ def game_edit(request, game_id):
     except models.Player.DoesNotExist:
         raise Http404
 
+    initial = {
+        'home_team': game.home_roster.team_id,
+        'away_team': game.away_roster.team_id,
+    }
     if request.method == 'POST':
-        game_form = forms.GameForm(request.POST, instance=game)
-        if game_form.is_valid():
+        game_form = forms.GameForm(request.POST, instance=game, initial=initial)
+        home_statistic_formset = forms.GameStatisticModelFormSet(
+            request.POST, prefix='home', instance=game.home_roster)
+        away_statistic_formset = forms.GameStatisticModelFormSet(
+            request.POST, prefix='away', instance=game.away_roster)
+        if game_form.is_valid() and home_statistic_formset.is_valid() \
+                and away_statistic_formset.is_valid():
             game = game_form.save()
+            # if home_team or away_team were changed, clear the statistics
+            if 'home_team' in game_form.changed_data:
+                game.home_roster.team = game_form.cleaned_data['home_team']
+                game.home_roster.save()
+                game.home_roster.player_statistics.all().delete()
+            else:
+                home_statistic_formset.save()
+            if 'away_team' in game_form.changed_data:
+                game.away_roster.team = game_form.cleaned_data['away_team']
+                game.away_roster.save()
+                game.away_roster.player_statistics.all().delete()
+            else:
+                away_statistic_formset.save()
+            if 'home_team' in game_form.changed_data or \
+               'away_team' in game_form.changed_data:
+                return redirect('game_edit', game_id=game.id)
             messages.success(request, 'Game {0} updated'.format(game))
             return redirect('game_view', game_id=game.id)
     else:
-        game_form = forms.GameForm(instance=game)
+        game_form = forms.GameForm(instance=game, initial=initial)
+        home_statistic_formset = forms.GameStatisticModelFormSet(
+            prefix='home', instance=game.home_roster)
+        away_statistic_formset = forms.GameStatisticModelFormSet(
+            prefix='away', instance=game.away_roster)
 
     return TemplateResponse(request, 'softball/game/edit.html', {
         'game': game,
         'game_form': game_form,
+        'home_statistic_formset': home_statistic_formset,
+        'away_statistic_formset': away_statistic_formset,
     })
 
 
