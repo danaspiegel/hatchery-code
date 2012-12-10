@@ -4,11 +4,13 @@
 
 {% block body %}
 <div class="page-header">
+    {% if user.is_authenticated %}
     <p class="pull-right">
         <a class="btn btn-danger" href="{% url team_delete team_id=team.id %}">
             Delete Team</a>
         <a class="btn" href="{% url team_edit team_id=team.id %}">Edit Team</a>
     </p>
+    {% endif %}
     <h1>
         {{ team.name }}
         <small>
@@ -22,10 +24,12 @@
     <div class="span12">
         <h3>Players</h3>
         {% include 'softball/team/part.player_list.html' with players=team.players %}
+        {% if user.is_authenticated %}
         <p>
             <a class="btn" href="{% url player_create %}?team_id={{ team.id }}&next={% url team_view team_id=team.id %}">
                 Add Player</a>
         </p>
+        {% endif %}
     </div>
 </div>
 
@@ -33,9 +37,11 @@
     <div class="span12">
         <h3>Games</h3>
         {% include 'softball/team/part.game_list.html' %}
+        {% if user.is_authenticated %}
         <p>
             <a class="btn" href="{% url game_create %}">Add Game</a>
         </p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

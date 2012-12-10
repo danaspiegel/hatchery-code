@@ -4,12 +4,14 @@
 
 {% block body %}
 <div class="page-header">
+    {% if user.is_authenticated %}
     <p class="pull-right">
         <a class="btn btn-danger" href="{% url player_delete player_id=player.id %}">
             Delete Player</a>
         <a class="btn" href="{% url player_edit player_id=player.id %}">
             Edit Player</a>
     </p>
+    {% endif %}
     <h1>
         {{ player.name }}
         <small>

@@ -3,6 +3,7 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 import models
 import forms
@@ -34,6 +35,7 @@ def team_view(request, team_id):
     })
 
 
+@login_required
 def team_create(request):
     if request.method == 'POST':
         team_form = forms.TeamForm(request.POST)
@@ -49,6 +51,7 @@ def team_create(request):
     })
 
 
+@login_required
 def team_edit(request, team_id):
     try:
         team = models.Team.objects.get(pk=team_id)
@@ -75,6 +78,7 @@ def team_edit(request, team_id):
     })
 
 
+@login_required
 def team_delete(request, team_id):
     try:
         team = models.Team.objects.get(pk=team_id)
@@ -110,6 +114,7 @@ def player_view(request, player_id):
     })
 
 
+@login_required
 def player_create(request):
     # if there's a team_id specified, use that team as the preset team for
     # this player
@@ -143,6 +148,7 @@ def player_create(request):
     })
 
 
+@login_required
 def player_edit(request, player_id):
     try:
         player = models.Player.objects.get(pk=player_id)
@@ -168,6 +174,7 @@ def player_edit(request, player_id):
     })
 
 
+@login_required
 def player_delete(request, player_id):
     try:
         player = models.Player.objects.get(pk=player_id)
@@ -205,6 +212,7 @@ def game_view(request, game_id):
     })
 
 
+@login_required
 def game_create(request):
     if request.method == 'POST':
         game_form = forms.GameForm(request.POST)
@@ -230,6 +238,7 @@ def game_create(request):
     })
 
 
+@login_required
 def game_edit(request, game_id):
     try:
         game = models.Game.objects.get(pk=game_id)
@@ -282,6 +291,7 @@ def game_edit(request, game_id):
     })
 
 
+@login_required
 def game_delete(request, game_id):
     try:
         game = models.Game.objects.get(pk=game_id)

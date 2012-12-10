@@ -52,11 +52,13 @@
             </table>
         </div>
         <div class="span4">
+            {% if user.is_authenticated %}
             <p class="right">
                 <a class="btn btn-danger" href="{% url game_delete game_id=game.id %}">
                     Delete Game</a>
                 <a class="btn" href="{% url game_edit game_id=game.id %}">Edit Game</a>
             </p>
+            {% endif %}
         </div>
     </div>
 
