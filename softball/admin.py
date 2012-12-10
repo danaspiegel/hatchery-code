@@ -5,16 +5,16 @@ from models import Team, Player, Game, Roster, Statistic
 
 class GameStatisticAdmin(admin.TabularInline):
     model = Statistic
-    fields = ('player', 'at_bats', 'runs', 'singles', 'doubles', 'triples',
-              'home_runs', 'rbis', 'walks', 'strikeouts', )
+    fields = ('player', 'at_bats', 'runs', 'rbis', 'walks', 'strikeouts',
+              'singles', 'doubles', 'triples', 'home_runs', )
     max_num = 12
     extra = 12
 
 
 class PlayerStatisticAdmin(admin.TabularInline):
     model = Statistic
-    fields = ('roster', 'at_bats', 'runs', 'singles', 'doubles', 'triples',
-              'home_runs', 'rbis', 'walks', 'strikeouts', )
+    fields = ('roster', 'at_bats', 'runs', 'rbis', 'walks', 'strikeouts',
+              'singles', 'doubles', 'triples', 'home_runs', )
     extra = 3
 
 
@@ -23,10 +23,10 @@ class TeamAdmin(admin.ModelAdmin):
 
 
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'number', 'team', 'batting_average',
-                    'on_base_percentage', 'slugging_percentage', 'at_bats',
-                    'hits', 'runs', 'singles', 'doubles', 'triples',
-                    'home_runs', 'rbis', 'walks', 'strikeouts', )
+    list_display = ('name', 'number', 'team', 'at_bats', 'runs', 'hits', 'rbis',
+                    'walks', 'strikeouts', 'singles', 'doubles', 'triples',
+                    'home_runs', 'batting_average', 'on_base_percentage',
+                    'slugging_percentage', )
     search_fields = ('name', 'number', 'team__name', )
     list_filter = ('team', )
     readonly_fields = ('batting_average', 'on_base_percentage',
@@ -38,10 +38,10 @@ class PlayerAdmin(admin.ModelAdmin):
             'fields': ('name', 'number', 'team', )
         }),
         ('Performance', {
-            'fields': ('batting_average', 'on_base_percentage',
-                       'slugging_percentage', 'at_bats', 'runs', 'singles',
-                       'doubles', 'triples', 'home_runs', 'rbis', 'walks',
-                       'strikeouts', )
+            'fields': ('at_bats', 'runs', 'rbis', 'walks', 'strikeouts',
+                       'singles', 'doubles', 'triples', 'home_runs',
+                       'batting_average', 'on_base_percentage',
+                       'slugging_percentage', )
         }),
     )
     inlines = (PlayerStatisticAdmin, )

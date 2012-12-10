@@ -6,22 +6,58 @@
 {% endblock %}
 
 {% block body %}
-    <div class="page-header">
-        <p class="pull-right">
-            <a class="btn btn-danger" href="{% url game_delete game_id=game.id %}">
-                Delete Game</a>
-            <a class="btn" href="{% url game_edit game_id=game.id %}">Edit Game</a>
-        </p>
-        <h1>
-            <a href="{% url team_view team_id=away_roster.team.id %}">
-                {{ away_roster.team.name }}</a>
-            vs.
-            <a href="{% url team_view team_id=home_roster.team.id %}">
-                {{ home_roster.team }}</a>
-            <small>
-                {{ game.location }} on {{ game.played_on }}
-            </small>
-        </h1>
+    <div class="row-fluid">
+        <div class="span6">
+            <h1>
+                {{ away_roster.team.name }} <span class="muted">{{ game.away_score }}</span>
+                {{ home_roster.team }} <span class="muted">{{ game.home_score }}</span>
+            </h1>
+            <p>{{ game.location }} / {{ game.played_on }}</p>
+        </div>
+        <div class="span2">
+            <table class="table table-condensed table-hover">
+                <thead>
+                    <tr>
+                        <th>Team</th>
+                        <th class="right">R</th>
+                        <th class="right">H</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <nobr>
+                            {{ away_roster.team.name }}
+                            {% if game.winner == away_roster.team %}
+                                <i style="vertical-align: baseline;" class="icon-ok"></i>
+                            {% endif %}
+                            </nobr>
+                        </td>
+                        <td class="right">{{ game.away_score }}</td>
+                        <td class="right"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <nobr>
+                            {{ home_roster.team.name }}
+                            {% if game.winner == home_roster.team %}
+                                <i style="vertical-align: baseline;" class="icon-ok"></i>
+                            {% endif %}
+                            </nobr>
+                        </td>
+                        <td class="right">{{ game.home_score }}</td>
+                        <td class="right"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="span4">
+            <p class="right">
+                <a class="btn btn-danger" href="{% url game_delete game_id=game.id %}">
+                    Delete Game</a>
+                <a class="btn" href="{% url game_edit game_id=game.id %}">Edit Game</a>
+            </p>
+        </div>
     </div>
 
     <div class="row-fluid">

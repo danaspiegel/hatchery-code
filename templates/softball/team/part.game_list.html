@@ -3,7 +3,7 @@
     <thead>
         <tr>
             <th>Date</th>
-            <th>vs.</th>
+            <th>Against</th>
             <th>Location</th>
             <th>Score</th>
         </tr>
@@ -11,18 +11,11 @@
     <tbody>
         {% for roster in team.rosters.all %}
             {% with game=roster.game %}
-                <tr {% if game.winner == team %}
-                        class="text-success"
-                    {% else %}
-                        class="text-error"
-                {% endif %}>
+                <tr class="{% if game.winner == team %}text-success{% elif game.winner != None %}text-error{% endif %}">
                     <td>
                         <a href="{% url game_view game_id=game.id %}">
                             {{ game.played_on }}
                         </a>
-                        {% if game.home_roster == roster %}
-                            <i class="icon-home"></i>
-                        {% endif %}
                     </td>
                     <td>
                         {% if game.home_roster == roster %}
@@ -35,8 +28,14 @@
                             </a>
                         {% endif %}
                     </td>
-                    <td>{{ game.location }}</td>
-                    <td>{{ game.away_score }} to {{ game.home_score }}
+                    <td>
+                        {{ game.location }}
+                        {% if game.home_roster == roster %}
+                            <i class="icon-home"></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ game.away_score }} to {{ game.home_score }}
                         {% if game.winner == team %}<i class="icon-ok"></i>{% endif %}
                     </td>
                 </tr>

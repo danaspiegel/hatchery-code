@@ -1,5 +1,7 @@
 {% extends 'softball/base.html' %}
 
+{% load softball_tags %}
+
 {% block title %}Teams{% endblock %}
 
 {% block body %}
@@ -11,13 +13,24 @@
                     <th>Name</th>
                     <th>Number</th>
                     <th>Team</th>
-                    <th class="right">Batting Average</th>
-                    <th class="right">At Bats</th>
+                    <th class="right">AB</th>
+                    <th class="right">R</th>
+                    <th class="right">H</th>
+                    <th class="right">RBI</th>
+                    <th class="right">BB</th>
+                    <th class="right">SO</th>
+                    <th class="right">1B</th>
+                    <th class="right">2B</th>
+                    <th class="right">3B</th>
+                    <th class="right">HR</th>
+                    <th class="right">AVG</th>
+                    <th class="right">OBP</th>
+                    <th class="right">SLUG</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
-                    <td colspan="5">
+                    <td colspan="16">
                         <div class="span4">
                             <div class="pagination pagination-left pagination-small">
                                 <a class="btn" href="{% url player_create %}">Add Player</a>
@@ -80,10 +93,19 @@
                             {{ player.team.name }}
                         </a>
                     </td>
-                    <td class="right">
-                        {{ player.batting_average|default:"-" }}
-                    </td>
-                    <td class="right">{{ player.at_bats|default:"-" }}</td>
+                    <td class="right statistic">{{ player.at_bats|default:"-" }}</td>
+                    <td class="right statistic">{{ player.runs|default:"-" }}</td>
+                    <td class="right statistic">{{ player.hits|default:"-" }}</td>
+                    <td class="right statistic">{{ player.rbis|default:"-" }}</td>
+                    <td class="right statistic">{{ player.walks|default:"-" }}</td>
+                    <td class="right statistic">{{ player.strikeouts|default:"-" }}</td>
+                    <td class="right statistic">{{ player.singles|default:"-" }}</td>
+                    <td class="right statistic">{{ player.doubles|default:"-" }}</td>
+                    <td class="right statistic">{{ player.triples|default:"-" }}</td>
+                    <td class="right statistic">{{ player.home_runs|default:"-" }}</td>
+                    <td class="right statistic">{{ player.batting_average|fraction_only|default:"-" }}</td>
+                    <td class="right statistic">{{ player.on_base_percentage|fraction_only|default:"-" }}</td>
+                    <td class="right statistic">{{ player.slugging_percentage|fraction_only|default:"-" }}</td>
                 </tr>
             {% endfor %}
             </tbody>
