@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load url from future %}
 
 {% block title %}Login{% endblock %}
 
@@ -15,7 +14,7 @@
                 <div class="controls">
                     <span class="help-inline">{{ form.password.errors|join:", "|escape }}</span>
                         <br/>
-                    <span class="help-inline"><a href="{% url 'password_reset' %}">Forgot Password?</a></span>
+                    <span class="help-inline"><a href="{% url password_reset %}">Forgot Password?</a></span>
                 </div>
             </div>
 
