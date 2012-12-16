@@ -28,6 +28,8 @@ USE_L10N = True
 USE_TZ = True
 APPEND_SLASH = True
 
+LOGIN_REDIRECT_URL = '/softball/'
+
 MANDRILL_API_KEY = '1fdd2499-cd35-4496-b38c-7339a24c0a49'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
