@@ -1,7 +1,14 @@
 from django.forms import ModelForm, ModelChoiceField
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
+from django.contrib.auth.models import User
 
 import models
+
+
+class UserForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ('email', 'first_name', 'last_name', )
 
 
 class TeamForm(ModelForm):

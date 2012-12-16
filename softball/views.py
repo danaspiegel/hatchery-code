@@ -303,3 +303,20 @@ def game_delete(request, game_id):
     game.delete()
     messages.success(request, 'Game {0} deleted'.format(game))
     return redirect('game_list')
+
+
+@login_required
+def user_edit(request):
+    user = request.user
+    if request.method == 'POST':
+        form = forms.UserForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, u'User profile updated')
+            return redirect('user_edit')
+    else:
+        form = forms.UserForm(instance=user)
+    return TemplateResponse(request, 'softball/user_edit.html', {
+        'user': user,
+        'form': form,
+    })

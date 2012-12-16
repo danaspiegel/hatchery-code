@@ -4,45 +4,15 @@
 {% block title %}Login{% endblock %}
 
 {% block body %}
-
-
-<form action="{% url 'django.contrib.auth.views.login' %}" method="post" class="form-horizontal">
-    {% csrf_token %}
-    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+<form action="" method="post" class="form-horizontal">
     <input type="hidden" name="next" value="{{ next }}" />
 
     <div class="row-fluid">
         <div class="span12">
-
-            {% if form.non_field_errors or form.errors %}
-                <ol>
-                    {% for error in form.non_field_errors %}
-                        <li><strong>{{ error|escape }}</strong></li>
-                    {% endfor %}
-                </ol>
-            {% endif %}
-
-            <div class="control-group {% if form.username.errors %}error{% endif %}">
-                <label class="control-label {{ form.username.css_classes }}" for="{{ form.username.auto_id }}">
-                    {{ form.username.label }}{% if form.username.field.required %}*{% endif %}
-                </label>
-                <div class="controls">
-                    {{ form.username }}
-                    <span class="help-inline">{{ form.username.errors|join:", "|escape }}</span>
-                    {% if form.username.help_text %}
-                        <br/>
-                        <span class="help-inline"><em>{{ form.username.help_text|escape }}</em>
-                        </span>
-                    {% endif %}
-                </div>
-            </div>
+            {% include "include_form.html" %}
 
             <div class="control-group {% if form.password.errors %}error{% endif %}">
-                <label class="control-label {{ form.password.css_classes }}" for="{{ form.password.auto_id }}">
-                    {{ form.password.label }}{% if form.password.field.required %}*{% endif %}
-                </label>
                 <div class="controls">
-                    {{ form.password }}
                     <span class="help-inline">{{ form.password.errors|join:", "|escape }}</span>
                         <br/>
                     <span class="help-inline"><a href="{% url 'password_reset' %}">Forgot Password?</a></span>

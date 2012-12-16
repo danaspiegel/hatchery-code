@@ -28,6 +28,17 @@ USE_L10N = True
 USE_TZ = True
 APPEND_SLASH = True
 
+MANDRILL_API_KEY = '1fdd2499-cd35-4496-b38c-7339a24c0a49'
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+EMAIL_HOST = 'smtp.mandrillapp.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = 'dana@hatcherydevshop.com'
+EMAIL_HOST_PASSWORD = MANDRILL_API_KEY
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
 MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(PROJECT_PATH, 'static-collected')
@@ -117,7 +128,3 @@ LOGGING = {
 #        }
     }
 }
-
-MANDRILL_API_KEY = '1fdd2499-cd35-4496-b38c-7339a24c0a49'
-
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
