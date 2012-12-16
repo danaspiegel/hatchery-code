@@ -13,6 +13,8 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
+DEFAULT_FROM_EMAIL = 'dana@hatcherydevshop.com'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
