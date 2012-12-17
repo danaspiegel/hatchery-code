@@ -4,11 +4,15 @@
 
 {% block body %}
 <div class="page-header">
-    {% if user.is_authenticated %}
+    {% if team.owned_by == user %}
     <p class="pull-right">
+        {% if perms.softball.add_team %}
         <a class="btn btn-danger" href="{% url team_delete team_id=team.id %}">
             Delete Team</a>
+        {% endif %}
+        {% if perms.softball.change_team %}
         <a class="btn" href="{% url team_edit team_id=team.id %}">Edit Team</a>
+        {% endif %}
     </p>
     {% endif %}
     <h1>
@@ -24,7 +28,7 @@
     <div class="span12">
         <h3>Players</h3>
         {% include 'softball/team/part.player_list.html' with players=team.players %}
-        {% if user.is_authenticated %}
+        {% if team.owned_by == user and perms.softball.add_player %}
         <p>
             <a class="btn" href="{% url player_create %}?team_id={{ team.id }}&next={% url team_view team_id=team.id %}">
                 Add Player</a>
@@ -37,7 +41,7 @@
     <div class="span12">
         <h3>Games</h3>
         {% include 'softball/team/part.game_list.html' %}
-        {% if user.is_authenticated %}
+        {% if team.owned_by == user and perms.softball.add_game %}
         <p>
             <a class="btn" href="{% url game_create %}">Add Game</a>
         </p>

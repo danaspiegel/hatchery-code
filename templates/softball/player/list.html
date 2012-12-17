@@ -32,7 +32,7 @@
                 <tr>
                     <td colspan="16">
                         <div class="span4">
-                            {% if user.is_authenticated %}
+                            {% if perms.softball.add_player %}
                             <div class="pagination pagination-left pagination-small">
                                 <a class="btn" href="{% url player_create %}">Add Player</a>
                             </div>

@@ -1,4 +1,5 @@
 import django.db.models
+import django.contrib.auth.models
 
 import calc
 
@@ -8,6 +9,7 @@ class Team(django.db.models.Model):
     updated_on = django.db.models.DateTimeField(auto_now=True)
     name = django.db.models.CharField('Team Name', max_length=150,
                                       db_index=True)
+    owned_by = django.db.models.ForeignKey('auth.User', related_name='teams')
 
     def __unicode__(self):
         return self.name
@@ -24,6 +26,7 @@ class Player(django.db.models.Model):
     number = django.db.models.PositiveIntegerField()
     team = django.db.models.ForeignKey('Team', related_name='players',
                                        on_delete=django.db.models.CASCADE)
+    owned_by = django.db.models.ForeignKey('auth.User', related_name='players')
 
     class Meta:
         ordering = ["name", ]
@@ -146,6 +149,7 @@ class Game(django.db.models.Model):
                                                  related_name='home_game')
     away_roster = django.db.models.OneToOneField('Roster',
                                                  related_name='away_game')
+    owned_by = django.db.models.ForeignKey('auth.User', related_name='games')
 
     def __unicode__(self):
         return u'{0} on {1}'.format(self.location, self.played_on, )
@@ -195,6 +199,7 @@ class Roster(django.db.models.Model):
     updated_on = django.db.models.DateTimeField(auto_now=True)
     team = django.db.models.ForeignKey('Team', related_name='rosters',
                                        on_delete=django.db.models.CASCADE)
+    owned_by = django.db.models.ForeignKey('auth.User', related_name='rosters')
 
     def __unicode__(self):
         return '{0} - {1}'.format(self.team.name, self.id)
@@ -223,6 +228,8 @@ class Statistic(django.db.models.Model):
     roster = django.db.models.ForeignKey('Roster',
                                          related_name='player_statistics',
                                          on_delete=django.db.models.CASCADE)
+    owned_by = django.db.models.ForeignKey('auth.User',
+                                           related_name='player_statistics')
 
     class Meta:
         unique_together = ('player', 'roster', )

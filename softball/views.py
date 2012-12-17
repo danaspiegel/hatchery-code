@@ -3,7 +3,8 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth import authenticate, login
 
 import models
 import forms
@@ -36,15 +37,18 @@ def team_view(request, team_id):
 
 
 @login_required
+@permission_required('softball.add_team')
 def team_create(request):
     if request.method == 'POST':
-        team_form = forms.TeamForm(request.POST)
+        team_form = forms.TeamForm(data=request.POST, user=request.user)
         if team_form.is_valid():
-            team = team_form.save()
+            team = team_form.save(commit=False)
+            team.owned_by = request.user
+            team.save()
             messages.success(request, 'Team {0} created'.format(team.name))
             return redirect('team_edit', team_id=team.id)
     else:
-        team_form = forms.TeamForm()
+        team_form = forms.TeamForm(user=request.user)
 
     return TemplateResponse(request, 'softball/team/create.html', {
         'team_form': team_form,
@@ -52,23 +56,28 @@ def team_create(request):
 
 
 @login_required
+@permission_required('softball.change_team')
 def team_edit(request, team_id):
     try:
-        team = models.Team.objects.get(pk=team_id)
+        team = models.Team.objects.get(pk=team_id, owned_by=request.user)
     except models.Team.DoesNotExist:
         raise Http404
 
     if request.method == 'POST':
-        team_form = forms.TeamForm(request.POST, instance=team)
-        player_formset = forms.TeamPlayerFormSet(request.POST, instance=team)
+        team_form = forms.TeamForm(data=request.POST, user=request.user,
+                                   instance=team)
+        player_formset = forms.TeamPlayerModelFormSet(data=request.POST,
+                                                      user=request.user,
+                                                      instance=team)
         if team_form.is_valid() and player_formset.is_valid():
             team = team_form.save()
             messages.success(request, 'Team {0} updated'.format(team.name))
             player_formset.save()
             return redirect('team_view', team_id=team.id)
     else:
-        team_form = forms.TeamForm(instance=team)
-        player_formset = forms.TeamPlayerFormSet(instance=team)
+        team_form = forms.TeamForm(request.user, instance=team)
+        player_formset = forms.TeamPlayerModelFormSet(user=request.user,
+                                                      instance=team)
 
     return TemplateResponse(request, 'softball/team/edit.html', {
         'team': team,
@@ -79,9 +88,10 @@ def team_edit(request, team_id):
 
 
 @login_required
+@permission_required('softball.delete_team')
 def team_delete(request, team_id):
     try:
-        team = models.Team.objects.get(pk=team_id)
+        team = models.Team.objects.get(pk=team_id, owned_by=request.user)
     except models.Player.DoesNotExist:
         raise Http404
     team.delete()
@@ -115,23 +125,26 @@ def player_view(request, player_id):
 
 
 @login_required
+@permission_required('softball.add_player')
 def player_create(request):
     # if there's a team_id specified, use that team as the preset team for
     # this player
     team = models.Team()
     if 'team_id' in request.GET:
         try:
-            team = models.Team.objects.get(pk=request.GET['team_id'])
+            team = models.Team.objects.get(pk=request.GET['team_id'],
+                                           owned_by=request.user)
         except models.Team.DoesNotExist, e:
             # Team doesn't exist, so just use an empty team
             pass
-    player = models.Player(team=team)
+    player = models.Player(team=team, owned_by=request.user)
 
     # if provided get the "next" url to send the user to on success or cancel
     next_url = request.GET.get('next')
 
     if request.method == 'POST':
-        player_form = forms.PlayerForm(request.POST, instance=player)
+        player_form = forms.PlayerForm(data=request.POST, user=request.user,
+                                       instance=player)
         if player_form.is_valid():
             player = player_form.save()
             messages.success(request, 'Player {0} created'.format(player))
@@ -139,7 +152,7 @@ def player_create(request):
                 return redirect(next_url)
             return redirect('player_view', player_id=player.id)
     else:
-        player_form = forms.PlayerForm(instance=player)
+        player_form = forms.PlayerForm(request.user, instance=player)
 
     return TemplateResponse(request, 'softball/player/create.html', {
         'player': player,
@@ -149,14 +162,16 @@ def player_create(request):
 
 
 @login_required
+@permission_required('softball.change_player')
 def player_edit(request, player_id):
     try:
-        player = models.Player.objects.get(pk=player_id)
+        player = models.Player.objects.get(pk=player_id, owned_by=request.user)
     except models.Player.DoesNotExist:
         raise Http404
     if request.method == 'POST':
-        player_form = forms.PlayerForm(request.POST, instance=player)
-        statistic_formset = forms.PlayerStatisticModelFormSet(request.POST,
+        player_form = forms.PlayerForm(data=request.POST, user=request.user,
+                                       instance=player)
+        statistic_formset = forms.PlayerStatisticModelFormSet(data=request.POST,
                                                               instance=player)
         if player_form.is_valid() and statistic_formset.is_valid():
             player = player_form.save()
@@ -164,7 +179,7 @@ def player_edit(request, player_id):
             messages.success(request, 'Player {0} updated'.format(player.name))
             return redirect('player_view', player_id=player.id)
     else:
-        player_form = forms.PlayerForm(instance=player)
+        player_form = forms.PlayerForm(request.user, instance=player)
         statistic_formset = forms.PlayerStatisticModelFormSet(instance=player)
 
     return TemplateResponse(request, 'softball/player/edit.html', {
@@ -175,9 +190,10 @@ def player_edit(request, player_id):
 
 
 @login_required
+@permission_required('softball.delete_player')
 def player_delete(request, player_id):
     try:
-        player = models.Player.objects.get(pk=player_id)
+        player = models.Player.objects.get(pk=player_id, owned_by=request.user)
     except models.Player.DoesNotExist:
         raise Http404
     player.delete()
@@ -213,35 +229,38 @@ def game_view(request, game_id):
 
 
 @login_required
+@permission_required('softball.add_game')
 def game_create(request):
     if request.method == 'POST':
-        game_form = forms.GameForm(request.POST)
+        game_form = forms.GameForm(data=request.POST, user=request.user)
         if game_form.is_valid():
             # home_team must be assigned a roster
             home_roster = models.Roster(
-                team=game_form.cleaned_data['home_team'])
+                team=game_form.cleaned_data['home_team'], owned_by=request.user)
             home_roster.save()
             # away_team must be assigned a roster
             away_roster = models.Roster(
-                team=game_form.cleaned_data['away_team'])
+                team=game_form.cleaned_data['away_team'], owned_by=request.user)
             away_roster.save()
             game = game_form.save(commit=False)
             game.home_roster = home_roster
             game.away_roster = away_roster
+            game.owned_by = request.user
             game.save()
             messages.success(request, 'Game {0} created'.format(game))
             return redirect('game_edit', game_id=game.id)
     else:
-        game_form = forms.GameForm()
+        game_form = forms.GameForm(request.user)
     return TemplateResponse(request, 'softball/game/create.html', {
         'game_form': game_form,
     })
 
 
 @login_required
+@permission_required('softball.change_game')
 def game_edit(request, game_id):
     try:
-        game = models.Game.objects.get(pk=game_id)
+        game = models.Game.objects.get(pk=game_id, owned_by=request.user)
     except models.Player.DoesNotExist:
         raise Http404
 
@@ -250,7 +269,8 @@ def game_edit(request, game_id):
         'away_team': game.away_roster.team_id,
     }
     if request.method == 'POST':
-        game_form = forms.GameForm(request.POST, instance=game, initial=initial)
+        game_form = forms.GameForm(data=request.POST, user=request.user,
+                                   instance=game, initial=initial)
         home_statistic_formset = forms.GameStatisticModelFormSet(
             request.POST, prefix='home', instance=game.home_roster)
         away_statistic_formset = forms.GameStatisticModelFormSet(
@@ -277,7 +297,7 @@ def game_edit(request, game_id):
             messages.success(request, 'Game {0} updated'.format(game))
             return redirect('game_view', game_id=game.id)
     else:
-        game_form = forms.GameForm(instance=game, initial=initial)
+        game_form = forms.GameForm(request.user, instance=game, initial=initial)
         home_statistic_formset = forms.GameStatisticModelFormSet(
             prefix='home', instance=game.home_roster)
         away_statistic_formset = forms.GameStatisticModelFormSet(
@@ -292,9 +312,10 @@ def game_edit(request, game_id):
 
 
 @login_required
+@permission_required('softball.delete_game')
 def game_delete(request, game_id):
     try:
-        game = models.Game.objects.get(pk=game_id)
+        game = models.Game.objects.get(pk=game_id, owned_by=request.user)
     except models.Game.DoesNotExist:
         raise Http404
     # be sure to delete the rosters first!
@@ -309,7 +330,7 @@ def game_delete(request, game_id):
 def user_edit(request):
     user = request.user
     if request.method == 'POST':
-        form = forms.UserForm(request.POST, instance=user)
+        form = forms.UserForm(data=request.POST, instance=user)
         if form.is_valid():
             form.save()
             messages.success(request, u'User profile updated')
@@ -318,5 +339,24 @@ def user_edit(request):
         form = forms.UserForm(instance=user)
     return TemplateResponse(request, 'softball/user_edit.html', {
         'user': user,
+        'form': form,
+    })
+
+
+def user_signup(request):
+    if request.method == 'POST':
+        form = forms.UserSignupForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            # log user in
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            messages.success(request, u'Welcome to the Softball Tracker')
+            return redirect('softball_home')
+    else:
+        form = forms.UserSignupForm()
+    return TemplateResponse(request, 'softball/user_signup.html', {
         'form': form,
     })

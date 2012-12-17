@@ -30,4 +30,5 @@ urlpatterns = patterns('',
     url(r'^game/(?P<game_id>\d+)/delete/$', 'softball.views.game_delete',
         name='game_delete'),
     url(r'^user/$', 'softball.views.user_edit', name='user_edit'),
+    url(r'^user/signup/$', 'softball.views.user_signup', name='user_signup'),
 )
