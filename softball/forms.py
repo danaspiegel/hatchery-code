@@ -29,6 +29,13 @@ class TeamForm(ModelForm):
         self.user = user
         super(TeamForm, self).__init__(*args, **kwargs)
 
+    def save(self, commit=True):
+        team = super(TeamForm, self).save(commit=False)
+        team.owned_by = self.user
+        if commit:
+            team.save()
+        return team
+
 
 class PlayerForm(ModelForm):
     error_css_class = 'text-error'
@@ -42,6 +49,13 @@ class PlayerForm(ModelForm):
         self.user = user
         super(PlayerForm, self).__init__(*args, **kwargs)
         self.fields['team'].queryset = self.user.teams.all()
+
+    def save(self, commit=True):
+        player = super(PlayerForm, self).save(commit=False)
+        player.owned_by = self.user
+        if commit:
+            player.save()
+        return player
 
 
 class GameForm(ModelForm):
